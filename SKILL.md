@@ -90,7 +90,7 @@ Read `references/04-contrastive-loser-traps-and-habits.md`. Attack every candida
 2. **`Cosmetic Sponsor Bolt-On`:** If you swap the sponsor's SDK for Postgres or generic OpenAI in 20 minutes, does the core mechanism survive? If yes, rebuild until the sponsor's unique primitive is **100% load-bearing**.
 3. **`Wrong Room Mismatch`:** Never send a dry ERP table into a `C1` campus expo, and never send pitch fluff into a `C9` blind quant leaderboard.
 4. **`3-Paragraph Setup Tax`:** If understanding why the demo button matters takes > 20 seconds of reading, compress or throw it out.
-5. **`Pure Brake Fatigue`:** Never build a hall-monitor blocker alone—prove the **10x offensive unlock** it makes safe (`Formula 1 Law`).
+5. **`Pure Brake Fatigue (The 50/50 Throttle Law)`:** Never build a hall-monitor blocker alone. If building a shield or gate, it is FORBIDDEN to show only red refusal screens. Exactly 50% of your demonstration must show the autonomous high-speed green path (auto-merging to production, instant settlement, zero-click release) that is only possible because the brake is guarding the rails (`Formula 1 Law`).
 
 ### Phase 5: Birth Framing Engineering & Code Entrypoint
 
