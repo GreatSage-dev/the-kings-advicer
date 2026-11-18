@@ -109,7 +109,7 @@ check("Zero excluded builder handles or removed down-scoping gate anywhere in pa
   }
 });
 
-check("query-brain.mjs runs --stats, --condition, --framing, and --neighbors cleanly", () => {
+check("query-brain.mjs runs --stats, --tracks, --condition, --framing, and --neighbors cleanly", () => {
   const runQ = (args) =>
     spawnSync(process.execPath, [path.join(ROOT, "scripts/query-brain.mjs"), ...args], {
       encoding: "utf8",
@@ -120,6 +120,15 @@ check("query-brain.mjs runs --stats, --condition, --framing, and --neighbors cle
   const stats = JSON.parse(statsRes.stdout);
   assert.equal(stats.total_outside_winners, 1005);
   assert.equal(stats.graph_nodes, 1267);
+
+  const tracksRes = runQ(["--tracks", "World ID,Uniswap v4,Circle USDC,Open Innovation", "--json"]);
+  assert.equal(tracksRes.status, 0, tracksRes.stderr);
+  const tJson = JSON.parse(tracksRes.stdout);
+  const findTrack = (name) => tJson.analyzed.find((a) => a.track === name);
+  assert.equal(findTrack("Open Innovation")?.crowding_risk, "HIGH_CROWD_BAIT");
+  assert.ok(findTrack("World ID")?.layer.startsWith("Layer 1"), "World ID should map to Layer 1");
+  assert.ok(findTrack("Uniswap v4")?.layer.startsWith("Layer 2"), "Uniswap v4 should map to Layer 2");
+  assert.ok(findTrack("Circle USDC")?.layer.startsWith("Layer 3"), "Circle USDC should map to Layer 3");
 
   const condRes = runQ(["--condition", "C2", "--framing", "F2", "--json", "--limit", "5"]);
   assert.equal(condRes.status, 0, condRes.stderr);

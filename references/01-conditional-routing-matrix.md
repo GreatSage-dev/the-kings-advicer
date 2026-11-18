@@ -1,6 +1,28 @@
 # Conditional Routing Matrix (`C1`–`C11`, `B1`–`B6`, `J1`–`J4`)
 
-Hackathon winning is **conditional**, never one-size-fits-all. An idea engineered to win a 4-week Solana Colosseum venture incubator (`Reflect`) loses on a 36-hour TreeHacks tabletop gym floor (`diffuji`). Always classify the room along **Condition**, **Sponsor Payoff**, and **Judge Archetype** before ideating.
+Hackathon winning is **conditional**, never one-size-fits-all. An idea engineered to win a 4-week Solana Colosseum venture incubator (`Reflect`) loses on a 36-hour TreeHacks tabletop gym floor (`diffuji`). Always classify the room along **Track Selection (`Phase 0`)**, **Condition**, **Sponsor Payoff**, and **Judge Archetype** before ideating.
+
+---
+
+## 0. Phase 0: Track Selection & 3-Layer Atomic Bounty Stacking
+
+When a hackathon offers multiple main tracks and 10–30 sponsor bounties, never pick by gut or prize headline alone. Run every track option through these **5 empirical track-selection laws** (`node scripts/query-brain.mjs --tracks "<track1,track2,...>"`):
+
+1. **Setup-Friction Arbitrage (`Prize Pool ÷ Expected Submissions`):**
+   - Low-friction bait tracks (*"Best AI Wrapper"*, *"Open Innovation"*, *"Social Consumer App"*) absorb 60–70% of the room (`HIGH_CROWD_BAIT`).
+   - High-friction technical tracks (`<90d` SDKs, Uniswap v4 Hooks, ZK/TLSNotary, FHE, Arbitrum Stylus/Rust, edge hardware) filter out 85% of teams in Hour 1 (`HIGH_EV_SNIPER`), yielding **5x–10x higher expected value** and direct `J1` protocol-engineer advocacy during Grand Finalist voting.
+2. **The `<90-Day` Sponsor Desperation Signal:**
+   - Prioritize sponsors whose SDK, EIP, hook, or model shipped in the **last 90 days** (`B2` Day-Zero Proof) or whose ecosystem suffers a known developer bottleneck (`B3` Shame Unblocker). They desperately need flagship Monday-morning demos; older generic sponsors often award unpredictably.
+3. **The 3-Layer Atomic Bounty Stack (`1 Main Track + 2–3 Orthogonal Sponsor Bounties`):**
+   - **Ban Frankenstein Bounty-Farming:** Never stack `>4` sponsors or pair two sponsors doing the same job (e.g., two L1s or two storage APIs — `Layer Collision Warning`).
+   - Every selected sponsor must occupy a **distinct vertical layer of one 10-second user action** so removing any sponsor collapses the flow:
+     - **Layer 1 — Ingress / Identity / Sensing / Voice:** *(e.g., ElevenLabs, World ID, TLSNotary, Camera/Hardware)*
+     - **Layer 2 — Core Compute / Hook / Verifier / State:** *(e.g., Uniswap v4 Hook, Arbitrum Stylus, Fhenix FHE, Custom Engine)*
+     - **Layer 3 — Settlement / Storage / Messaging Rail:** *(e.g., Circle USDC, LayerZero, Walrus, Supabase)*
+4. **The Rubric Orthogonality Law:**
+   - Never mix tracks whose Conditions (`C1`–`C11`) or Judge Archetypes (`J1`–`J4`) punish each other (e.g., do not combine a `C1` playful tabletop meme track with a `C10` institutional compliance track or `C7` formal security verification track).
+5. **The Side-Door Track Entry:**
+   - When the "AI / Agent Track" has 200+ wrapper teams, enter a specialized domain track (`FinTech`, `Security`, `Robotics`, `DeFi`, `DevTools`) with `<25` submissions and deploy AI/multimodal transduction inside it as the engine.
 
 ---
 

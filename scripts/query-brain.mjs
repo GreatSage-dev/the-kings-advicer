@@ -5,6 +5,7 @@
  *
  * Examples:
  *   node scripts/query-brain.mjs --stats
+ *   node scripts/query-brain.mjs --tracks "World ID,Uniswap v4,Circle USDC,Open Innovation"
  *   node scripts/query-brain.mjs --condition C2 --limit 8
  *   node scripts/query-brain.mjs --framing F2 --query "voice"
  *   node scripts/query-brain.mjs --neighbors "creat_premise_inversion"
@@ -56,6 +57,7 @@ function parseArgs(argv) {
     else if (k === "--scamper" && argv[i + 1]) args.scamper = argv[++i];
     else if (k === "--query" && argv[i + 1]) args.query = argv[++i];
     else if (k === "--neighbors" && argv[i + 1]) args.neighbors = argv[++i];
+    else if (k === "--tracks" && argv[i + 1]) args.tracks = argv[++i];
     else if (k === "--limit" && argv[i + 1]) args.limit = Math.max(1, parseInt(argv[++i], 10) || 10);
   }
   return args;
@@ -124,10 +126,172 @@ function getNeighbors(graph, nodeQuery, limit) {
   };
 }
 
+const LAYER_RULES = [
+  {
+    name: "Layer 1 (Ingress / Identity / Voice / Sensing)",
+    keywords: [
+      "voice", "elevenlabs", "world id", "worldcoin", "tlsnotary", "zkpass",
+      "privy", "dynamic", "lit", "camera", "vision", "sensor", "hardware",
+      "telegram", "whatsapp", "nfc", "qr",
+    ],
+  },
+  {
+    name: "Layer 2 (Core Compute / Hook / ZK / Model / Enclave)",
+    keywords: [
+      "uniswap", "hook", "fhe", "fhenix", "inca", "inco", "aztec", "noir",
+      "risc zero", "succinct", "sp1", "stylus", "eigenlayer", "avs", "tee",
+      "phala", "marlin", "openai", "anthropic", "claude", "mistral", "gemini",
+      "vlm", "llm", "agent", "langgraph", "mcp",
+    ],
+  },
+  {
+    name: "Layer 3 (Settlement / Storage / Cross-Chain / Rail)",
+    keywords: [
+      "circle", "usdc", "stripe", "plaid", "layerzero", "wormhole",
+      "chainlink", "ccip", "walrus", "filecoin", "arweave", "celestia",
+      "avail", "supabase", "neon", "cloudflare", "base", "solana", "sui",
+      "aptos", "arbitrum", "optimism", "polygon",
+    ],
+  },
+];
+
+const BAIT_KEYWORDS = [
+  "open track", "open innovation", "open ai", "general",
+  "best ai", "ai wrapper", "anything", "social",
+];
+
+const SPECIFIC_PRIMITIVE_KEYWORDS = [
+  "world id", "worldcoin", "tlsnotary", "zkpass", "elevenlabs", "camera",
+  "sensor", "hardware", "uniswap", "hook", "fhe", "fhenix", "aztec", "noir",
+  "risc zero", "succinct", "sp1", "stylus", "eigenlayer", "tee", "phala",
+  "marlin", "circle", "usdc", "stripe", "plaid", "layerzero", "wormhole",
+  "chainlink", "ccip", "walrus", "filecoin", "arweave", "celestia", "supabase",
+  "neon", "cloudflare", "solana", "sui", "aptos", "arbitrum", "optimism", "polygon",
+  "rust", "zk",
+];
+
+const TRACK_STOPWORDS = new Set([
+  "track", "best", "use", "open", "for", "the", "and", "with",
+  "api", "sdk", "innovation", "general", "bounty", "prize", "main",
+]);
+
+function hasKeyword(text, kw) {
+  const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`\\b${escaped}\\b`, "i").test(text);
+}
+
+/**
+ * Classifies candidate hackathon tracks/sponsors into atomic stack layers,
+ * flags crowd-bait tracks, surfaces precedent winners, and recommends a 3-layer stack.
+ */
+function analyzeTracks(tracksCsv, winners) {
+  const trackNames = tracksCsv.split(",").map((s) => s.trim()).filter(Boolean);
+  const analyzed = trackNames.map((track) => {
+    const matchedLayer = LAYER_RULES.find((rule) => rule.keywords.some((kw) => hasKeyword(track, kw)));
+    const layer = matchedLayer ? matchedLayer.name : "Main / Domain Track";
+    const isBait = BAIT_KEYWORDS.some((kw) => hasKeyword(track, kw)) &&
+      !SPECIFIC_PRIMITIVE_KEYWORDS.some((kw) => hasKeyword(track, kw));
+    const crowding_risk = isBait ? "HIGH_CROWD_BAIT" : "HIGH_EV_SNIPER";
+
+    const lowTrack = track.toLowerCase();
+    const tokens = lowTrack.split(/[^a-z0-9]+/).filter((t) => t.length >= 2 && !TRACK_STOPWORDS.has(t));
+    let matchedWinners = winners.filter((w) => {
+      const hay = `${w.project} ${w.section} ${w.raw_idea} ${w.precedent}`.toLowerCase();
+      return hay.includes(lowTrack);
+    });
+    if (matchedWinners.length === 0 && tokens.length > 0) {
+      matchedWinners = winners.filter((w) => {
+        const hay = `${w.project} ${w.section} ${w.raw_idea} ${w.precedent}`.toLowerCase();
+        return tokens.some((tok) => hasKeyword(hay, tok));
+      });
+    }
+
+    return {
+      track,
+      layer,
+      crowding_risk,
+      matching_winners_count: matchedWinners.length,
+      sample_precedents: matchedWinners.slice(0, 3).map((w) => ({
+        id: w.id,
+        project: w.project,
+        framing_formula: w.framing_formula,
+      })),
+    };
+  });
+
+  const pickBest = (layerName) =>
+    analyzed.find((a) => a.layer === layerName && a.crowding_risk === "HIGH_EV_SNIPER") ||
+    analyzed.find((a) => a.layer === layerName && layerName !== "Main / Domain Track") ||
+    null;
+
+  const mainPick = analyzed.find((a) => a.layer === "Main / Domain Track" && a.crowding_risk === "HIGH_EV_SNIPER") || null;
+  const l1Pick = pickBest(LAYER_RULES[0].name);
+  const l2Pick = pickBest(LAYER_RULES[1].name);
+  const l3Pick = pickBest(LAYER_RULES[2].name);
+
+  const selectedStack = [mainPick, l1Pick, l2Pick, l3Pick].filter(Boolean).map((a) => a.track);
+
+  const warnings = [];
+  if (trackNames.length > 4) {
+    warnings.push(
+      `Frankenstein Bounty-Farming Risk: >4 tracks (${trackNames.length}) provided. Lock 1 Main Track + 2-3 orthogonal sponsors across Layers 1-3.`
+    );
+  }
+  for (const rule of LAYER_RULES) {
+    const colliding = analyzed.filter((a) => a.layer === rule.name);
+    if (colliding.length > 1) {
+      warnings.push(
+        `Layer Collision Warning: ${colliding.map((c) => c.track).join(" vs. ")} collide in ${rule.name}. Keep only one per layer.`
+      );
+    }
+  }
+  const baitTracks = analyzed.filter((a) => a.crowding_risk === "HIGH_CROWD_BAIT");
+  if (baitTracks.length > 0) {
+    warnings.push(
+      `Crowd-Bait Warning: ${baitTracks.map((b) => b.track).join(", ")} flagged HIGH_CROWD_BAIT — avoid generic wrapper positioning here unless using a Contrarian Premise Inversion.`
+    );
+  }
+
+  return {
+    input_tracks: trackNames,
+    analyzed,
+    stack_recommendation: {
+      main_or_domain_track: mainPick ? mainPick.track : null,
+      layer_1_ingress: l1Pick ? l1Pick.track : null,
+      layer_2_compute: l2Pick ? l2Pick.track : null,
+      layer_3_settlement: l3Pick ? l3Pick.track : null,
+      selected_stack: selectedStack,
+    },
+    warnings,
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   const winners = loadJson(WINNERS_PATH);
   const graph = loadJson(GRAPH_PATH);
+
+  if (args.tracks) {
+    const res = analyzeTracks(args.tracks, winners);
+    if (args.json) {
+      console.log(JSON.stringify(res, null, 2));
+    } else {
+      console.log("=== PHASE 0 TRACK SELECTION & 3-LAYER STACK ANALYSIS ===\n");
+      for (const a of res.analyzed) {
+        console.log(`- ${a.track}`);
+        console.log(`  Layer: ${a.layer} | Crowding: ${a.crowding_risk} | Precedents: ${a.matching_winners_count}`);
+        for (const p of a.sample_precedents) {
+          console.log(`    -> [${p.id}] ${p.project} (${p.framing_formula})`);
+        }
+      }
+      console.log("\nRecommended Atomic Stack:", res.stack_recommendation.selected_stack.join(" -> ") || "None");
+      if (res.warnings.length > 0) {
+        console.log("\nWarnings:");
+        for (const w of res.warnings) console.log(`  ! ${w}`);
+      }
+    }
+    return;
+  }
 
   if (args.stats) {
     const s = computeStats(winners, graph);

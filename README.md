@@ -8,8 +8,9 @@ Most AI idea prompts produce **"First Right Answer" slop**—recycling training-
 
 ## What It Produces
 
-Depending on whether you ask for new ideas or audit an existing one, the advisor delivers:
+Depending on whether you ask for track strategy, new ideas, or an audit of an existing concept, the advisor delivers:
 
+- **Phase 0 — Track Selection & 3-Layer Atomic Stack:** Ranks prize tracks via `Setup-Friction Arbitrage` and `<90d` sponsor desperation, flags crowd-bait tracks, and locks **1 Main Track + 2–3 Orthogonal Sponsor Bounties** (`Ingress -> Compute/Hook -> Settlement/Storage`).
 - **Room Diagnosis (`Signal-to-Payoff Router`):** Maps changelog age, judging duration/format, track crowding, and target surface to Conditions **`C1`–`C11`**, Sponsor Payoffs **`B1`–`B6`**, and Judge Archetypes **`J1`–`J4`**.
 - **3 Orthogonal Candidates (Never 3 Variations of the Same Idea):**
   1. **Channel 1 — Big-Company Category Port** (`740 / 1,005` = `73.6%` in `query-brain --stats`)
@@ -26,7 +27,7 @@ Depending on whether you ask for new ideas or audit an existing one, the advisor
 
 ```text
 the-kings-advicer/
-├── SKILL.md                                    # 6-phase ideation & audit workflow
+├── SKILL.md                                    # 7-phase track selection, ideation & audit workflow
 ├── README.md
 ├── data/
 │   ├── outside_winners_1005.json               # 1,005 structured external hackathon winners
@@ -52,6 +53,9 @@ Query the bundled knowledge graph directly from any terminal (`Node.js >= 18`):
 ```bash
 # Inspect graph stats across all 1,005 external winners + 1,267 nodes
 node scripts/query-brain.mjs --stats
+
+# Analyze & stack tracks across Ingress -> Compute -> Settlement while flagging bait tracks
+node scripts/query-brain.mjs --tracks "World ID,Uniswap v4,Circle USDC,Open AI Track"
 
 # Find winning precedents for a Day-Zero SDK launch (C2) using Polarity Flip framing (F2)
 node scripts/query-brain.mjs --condition C2 --framing F2 --limit 8

@@ -20,14 +20,31 @@ Never down-scope winning ambition to "safe small apps" based on time limits—di
 
 ---
 
-## Two Operating Modes
+## Operating Modes
 
-1. **Advisory Ideation Mode** (*"I'm entering [Hackathon / Track / Sponsor]; give me winning ideas"*): Run Phases 1–6 in order to deliver **3 orthogonal, battle-tested candidates**, each locked with a 4-Line Birth Frame.
-2. **Contrastive Idea Audit Mode** (*"Here is my idea for [Hackathon]; will it win or lose?"*): Run Phases 1, 4, 5, and 6 directly on the user's idea—exposing whether it hits a Smart-Loser Trap (`trap_*`), grading it on two separate scores, and proposing a sharp pivot if it scores below 8.
+1. **Track & Bounty Selection Mode** (*"Here is the hackathon prize page / 20 tracks—which track(s) should we enter?"*): Run **Phase 0** first via `node scripts/query-brain.mjs --tracks "<track1,track2,...>"`, then continue into Phases 1–6 on the winning stack.
+2. **Advisory Ideation Mode** (*"I'm entering [Hackathon / Track / Sponsor]; give me winning ideas"*): Run Phases 0–6 in order to deliver **3 orthogonal, battle-tested candidates**, each locked with a 4-Line Birth Frame.
+3. **Contrastive Idea Audit Mode** (*"Here is my idea for [Hackathon]; will it win or lose?"*): Run Phases 0, 1, 4, 5, and 6 directly on the user's idea—exposing whether it hits a Smart-Loser Trap (`trap_*`), grading it on two separate scores, and proposing a sharp pivot if it scores below 8.
 
 ---
 
-## The 6-Phase Advisory Workflow
+## The 7-Phase Advisory Workflow (`Phases 0–6`)
+
+### Phase 0: Track Selection & 3-Layer Atomic Bounty Stacking
+
+Read `references/01-conditional-routing-matrix.md` (Section 0). Never choose tracks by prize size alone or try to farm 5+ unrelated bounties:
+
+1. **Run Track Arbitrage Triage:** Inspect all available main tracks and sponsor bounties:
+   ```bash
+   node scripts/query-brain.mjs --tracks "<track1,track2,track3,track4>"
+   ```
+2. **Apply the 5 Empirical Track Rules:**
+   - **Setup-Friction Arbitrage:** Skip low-friction `HIGH_CROWD_BAIT` tracks (*"Open Innovation"*, *"Best AI Wrapper"*) where 60–70% of teams pile in; target `HIGH_EV_SNIPER` technical tracks (`<90d` SDKs, v4 Hooks, ZK/TLSNotary, FHE, Stylus, edge hardware) where 85% drop out in Hour 1.
+   - **`<90-Day` Desperation:** Prioritize sponsors pushing a recently launched primitive (`B2`) or solving an ecosystem bottleneck (`B3`).
+   - **3-Layer Atomic Stack (`1 Main Track + 2–3 Orthogonal Bounties`):** Every stacked sponsor must occupy a distinct vertical layer of **one 10-second user action**:
+     - *Layer 1 (Ingress / Identity / Sensing / Voice)* -> *Layer 2 (Core Compute / Hook / Verifier / State)* -> *Layer 3 (Settlement / Storage / Rail)*.
+   - **Rubric Orthogonality:** Never mix tracks whose Judge Archetypes (`J1`–`J4`) or Conditions (`C1`–`C11`) contradict each other.
+   - **Side-Door Entry:** When the main AI/Open track has 200+ wrappers, enter a specialized domain track (`FinTech`, `Security`, `Robotics`, `DeFi`) with `<25` teams and embed AI inside it.
 
 ### Phase 1: Diagnose the Room (`Signal-to-Payoff Router`)
 
@@ -96,8 +113,9 @@ node scripts/frame-lint.mjs --text "<Candidate 4-Line Birth Frame>"
 Present the final advisory cleanly using the template below. Never average the two scores (10/10 engineering/framing cannot rescue an Hour-1 clone, and 10/10 concept loses behind a 3-paragraph setup wall). End by handing the **Insula Taste Call** to the user so they pick or fuse their favorite before writing a line of code.
 
 ```markdown
-# The King's Advicer: <Hackathon / Track Name>
+# The King's Advicer: <Hackathon Name>
 
+**Recommended Track / Stack (`Phase 0`):** `<1 Main Track + 2–3 Orthogonal Layers (Ingress -> Compute -> Settlement)>`
 **Room Diagnosis:** `<Condition C1–C11>` · **Sponsor Payoff:** `<B1–B6>` · **Judge Lens:** `<J1–J4>`
 **Primary Evidence Checked:** <Sponsor changelog, maintainer issues, or user concept reviewed>
 
@@ -117,3 +135,14 @@ Present the final advisory cleanly using the template below. Never average the t
 ## Your Taste Call
 Which of these three directions triggers your **Insula gut instinct** (excitement, surprise, or *"why doesn't this exist yet"*), or which constraint should we press harder before starting build architecture?
 ```
+
+---
+
+## Stage 2 Hand-Off: Building Inside `King's Court` (`AGENTS.md`)
+
+`the-kings-advicer` is the **Pre-Code Brain** (Track Selection `Phase 0`, Condition Routing `C1`–`C11`, Dual-Brain Wall-Walk, Smart-Loser Gate, and `F1`–`F7` Birth Framing). Once the user locks their **Taste Call**, hand the winning 4-Line Birth Frame directly into **King's Court Execution** (`AGENTS.md` Sections 4–8):
+
+1. **Zero-Mock Mandate (`exit code === 0`):** Every mechanism ships with deterministic runnable verification tests (`npm test` / `node test.js`), zero fake arrays, and zero dead handlers.
+2. **Supreme Architectural Boundary:** AI parses unstructured inputs/signals; deterministic code owns scheduling arithmetic, financial ledgers, cryptographic state transitions, and refusal gates (`uiOnly: true` where human sign-off is mandatory).
+3. **15-Second Sensory / Split-Screen Win + Zero-Cold-Start Fallback:** Pre-seed realistic local fixtures under a zero-login `/judge` route so an evaluator triggers the contrast live in under 10 seconds even offline.
+4. **Boutique Studio UI & Submission Integrity:** High-density typography, 5-second Hero README, semantic atomic git commits, and deterministic `check:words` / `verify` / `evidence` scripts matching your `frame-lint.mjs` wording.
