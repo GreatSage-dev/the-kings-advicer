@@ -32,6 +32,7 @@ const CONDITION_ALIASES = {
   c9: "cond_c9_ml_leaderboard",
   c10: "cond_c10_conservative_corp",
   c11: "cond_c11_zero_sponsor_open",
+  c11b: "cond_c11b_community_meme_sprint",
 };
 
 const FRAMING_ALIASES = {

@@ -73,10 +73,10 @@ check("Bundled outside_winners_1005.json has exactly 1,005 external winners", ()
   assert.ok(winners.every((w) => w.condition && w.framing_formula && w.creativity_type));
 });
 
-check("Bundled graph.json has 1,267 nodes, 7,441 links, and zero dangling endpoints", () => {
+check("Bundled graph.json has 1,278 nodes, 7,468 links, and zero dangling endpoints", () => {
   const graph = JSON.parse(fs.readFileSync(path.join(ROOT, "data/graph.json"), "utf8"));
-  assert.equal(graph.nodes.length, 1267);
-  assert.equal(graph.links.length, 7441);
+  assert.equal(graph.nodes.length, 1278);
+  assert.equal(graph.links.length, 7468);
   const ids = new Set(graph.nodes.map((n) => n.id));
   for (const e of graph.links) {
     assert.ok(ids.has(e.source), `Dangling source ${e.source}`);
@@ -119,7 +119,7 @@ check("query-brain.mjs runs --stats, --tracks, --condition, --framing, and --nei
   assert.equal(statsRes.status, 0, statsRes.stderr);
   const stats = JSON.parse(statsRes.stdout);
   assert.equal(stats.total_outside_winners, 1005);
-  assert.equal(stats.graph_nodes, 1267);
+  assert.equal(stats.graph_nodes, 1278);
 
   const tracksRes = runQ(["--tracks", "World ID,Uniswap v4,Circle USDC,Open Innovation", "--json"]);
   assert.equal(tracksRes.status, 0, tracksRes.stderr);
