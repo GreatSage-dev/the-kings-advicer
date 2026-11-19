@@ -37,6 +37,7 @@ check("Required files and 5 references exist", () => {
     "README.md",
     "data/outside_winners_1005.json",
     "data/community_meme_winners_302.json",
+    "data/extra_winners_2000.json",
     "data/graph.json",
     "references/01-conditional-routing-matrix.md",
     "references/02-dual-brain-wall-walk-and-scamper.md",
@@ -78,6 +79,12 @@ check("Bundled community_meme_winners_302.json has exactly 302 verified C11-B wi
   const winners = JSON.parse(fs.readFileSync(path.join(ROOT, "data/community_meme_winners_302.json"), "utf8"));
   assert.equal(winners.length, 302);
   assert.ok(winners.every((w) => w.condition === "cond_c11b_community_meme_sprint" && w.framing_formula && w.creativity_type));
+});
+
+check("Bundled extra_winners_2000.json has exactly 2,000 verified extra winners with smart loser contrasts", () => {
+  const winners = JSON.parse(fs.readFileSync(path.join(ROOT, "data/extra_winners_2000.json"), "utf8"));
+  assert.equal(winners.length, 2000);
+  assert.ok(winners.every((w) => w.condition && w.framing_formula && w.creativity_type && w.smart_loser_contrast && w.outside_the_box_mechanism));
 });
 
 check("Bundled graph.json has 1,281 nodes, 7,482 links, and zero dangling endpoints", () => {

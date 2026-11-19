@@ -19,6 +19,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.resolve(__dirname, "..", "data");
 const WINNERS_PATH = path.join(DATA_DIR, "outside_winners_1005.json");
 const COMMUNITY_WINNERS_PATH = path.join(DATA_DIR, "community_meme_winners_302.json");
+const EXTRA_WINNERS_PATH = path.join(DATA_DIR, "extra_winners_2000.json");
 const GRAPH_PATH = path.join(DATA_DIR, "graph.json");
 
 const CONDITION_ALIASES = {
@@ -78,8 +79,8 @@ function resolveAlias(val, map) {
   return map[low] || val.trim();
 }
 
-function computeStats(outsideWinners, graph, communityWinners = []) {
-  const combined = [...outsideWinners, ...communityWinners];
+function computeStats(outsideWinners, graph, communityWinners = [], extraWinners = []) {
+  const combined = [...outsideWinners, ...communityWinners, ...extraWinners];
   const countBy = (arr, key) => {
     const out = {};
     for (const item of arr) {
@@ -91,6 +92,7 @@ function computeStats(outsideWinners, graph, communityWinners = []) {
   return {
     total_outside_winners: outsideWinners.length,
     total_community_winners: communityWinners.length,
+    total_extra_winners: extraWinners.length,
     total_combined_winners: combined.length,
     graph_nodes: (graph.nodes || []).length,
     graph_edges: (graph.links || []).length,
@@ -275,7 +277,8 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   const outsideWinners = loadJson(WINNERS_PATH);
   const communityWinners = fs.existsSync(COMMUNITY_WINNERS_PATH) ? loadJson(COMMUNITY_WINNERS_PATH) : [];
-  const winners = [...outsideWinners, ...communityWinners];
+  const extraWinners = fs.existsSync(EXTRA_WINNERS_PATH) ? loadJson(EXTRA_WINNERS_PATH) : [];
+  const winners = [...outsideWinners, ...communityWinners, ...extraWinners];
   const graph = loadJson(GRAPH_PATH);
 
   if (args.tracks) {
@@ -301,16 +304,17 @@ function main() {
   }
 
   if (args.stats) {
-    const s = computeStats(outsideWinners, graph, communityWinners);
+    const s = computeStats(outsideWinners, graph, communityWinners, extraWinners);
     if (args.json) {
       console.log(JSON.stringify(s, null, 2));
     } else {
       console.log(`=== THE KING'S ADVICER KNOWLEDGE BRAIN ===`);
-      console.log(`Outside Winners: ${s.total_outside_winners} | Graph Nodes: ${s.graph_nodes} | Graph Edges: ${s.graph_edges}\n`);
-      console.log("Outside Winners by Condition:", s.by_condition);
+      console.log(`Total Combined Winners: ${s.total_combined_winners} (Outside: ${s.total_outside_winners}, Community: ${s.total_community_winners}, Extra: ${s.total_extra_winners})`);
+      console.log(`Graph Nodes: ${s.graph_nodes} | Graph Edges: ${s.graph_edges}\n`);
+      console.log("Winners by Condition:", s.by_condition);
       console.log("Outside Winners by Framing:", s.by_framing_outside_only);
-      console.log("Outside Winners by Precedent:", s.by_precedent);
-      console.log("Outside Winners by Creativity:", s.by_creativity);
+      console.log("Winners by Precedent:", s.by_precedent);
+      console.log("Winners by Creativity:", s.by_creativity);
     }
     return;
   }
