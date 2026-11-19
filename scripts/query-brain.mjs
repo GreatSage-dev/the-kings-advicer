@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.resolve(__dirname, "..", "data");
 const WINNERS_PATH = path.join(DATA_DIR, "outside_winners_1005.json");
+const COMMUNITY_WINNERS_PATH = path.join(DATA_DIR, "community_meme_winners_302.json");
 const GRAPH_PATH = path.join(DATA_DIR, "graph.json");
 
 const CONDITION_ALIASES = {
@@ -77,7 +78,8 @@ function resolveAlias(val, map) {
   return map[low] || val.trim();
 }
 
-function computeStats(winners, graph) {
+function computeStats(outsideWinners, graph, communityWinners = []) {
+  const combined = [...outsideWinners, ...communityWinners];
   const countBy = (arr, key) => {
     const out = {};
     for (const item of arr) {
@@ -87,14 +89,16 @@ function computeStats(winners, graph) {
     return Object.fromEntries(Object.entries(out).sort((a, b) => b[1] - a[1]));
   };
   return {
-    total_outside_winners: winners.length,
+    total_outside_winners: outsideWinners.length,
+    total_community_winners: communityWinners.length,
+    total_combined_winners: combined.length,
     graph_nodes: (graph.nodes || []).length,
     graph_edges: (graph.links || []).length,
-    by_condition: countBy(winners, "condition"),
-    by_framing_outside_only: countBy(winners, "framing_formula"),
-    by_creativity: countBy(winners, "creativity_type"),
-    by_precedent: countBy(winners, "precedent_strategy"),
-    by_sponsor_benefit: countBy(winners, "sponsor_benefit"),
+    by_condition: countBy(combined, "condition"),
+    by_framing_outside_only: countBy(outsideWinners, "framing_formula"),
+    by_creativity: countBy(combined, "creativity_type"),
+    by_precedent: countBy(combined, "precedent_strategy"),
+    by_sponsor_benefit: countBy(combined, "sponsor_benefit"),
   };
 }
 
@@ -269,7 +273,9 @@ function analyzeTracks(tracksCsv, winners) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
-  const winners = loadJson(WINNERS_PATH);
+  const outsideWinners = loadJson(WINNERS_PATH);
+  const communityWinners = fs.existsSync(COMMUNITY_WINNERS_PATH) ? loadJson(COMMUNITY_WINNERS_PATH) : [];
+  const winners = [...outsideWinners, ...communityWinners];
   const graph = loadJson(GRAPH_PATH);
 
   if (args.tracks) {
@@ -295,7 +301,7 @@ function main() {
   }
 
   if (args.stats) {
-    const s = computeStats(winners, graph);
+    const s = computeStats(outsideWinners, graph, communityWinners);
     if (args.json) {
       console.log(JSON.stringify(s, null, 2));
     } else {

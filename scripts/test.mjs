@@ -36,6 +36,7 @@ check("Required files and 5 references exist", () => {
     "SKILL.md",
     "README.md",
     "data/outside_winners_1005.json",
+    "data/community_meme_winners_302.json",
     "data/graph.json",
     "references/01-conditional-routing-matrix.md",
     "references/02-dual-brain-wall-walk-and-scamper.md",
@@ -73,10 +74,16 @@ check("Bundled outside_winners_1005.json has exactly 1,005 external winners", ()
   assert.ok(winners.every((w) => w.condition && w.framing_formula && w.creativity_type));
 });
 
-check("Bundled graph.json has 1,278 nodes, 7,468 links, and zero dangling endpoints", () => {
+check("Bundled community_meme_winners_302.json has exactly 302 verified C11-B winners", () => {
+  const winners = JSON.parse(fs.readFileSync(path.join(ROOT, "data/community_meme_winners_302.json"), "utf8"));
+  assert.equal(winners.length, 302);
+  assert.ok(winners.every((w) => w.condition === "cond_c11b_community_meme_sprint" && w.framing_formula && w.creativity_type));
+});
+
+check("Bundled graph.json has 1,281 nodes, 7,482 links, and zero dangling endpoints", () => {
   const graph = JSON.parse(fs.readFileSync(path.join(ROOT, "data/graph.json"), "utf8"));
-  assert.equal(graph.nodes.length, 1278);
-  assert.equal(graph.links.length, 7468);
+  assert.equal(graph.nodes.length, 1281);
+  assert.equal(graph.links.length, 7482);
   const ids = new Set(graph.nodes.map((n) => n.id));
   for (const e of graph.links) {
     assert.ok(ids.has(e.source), `Dangling source ${e.source}`);
@@ -119,7 +126,7 @@ check("query-brain.mjs runs --stats, --tracks, --condition, --framing, and --nei
   assert.equal(statsRes.status, 0, statsRes.stderr);
   const stats = JSON.parse(statsRes.stdout);
   assert.equal(stats.total_outside_winners, 1005);
-  assert.equal(stats.graph_nodes, 1278);
+  assert.equal(stats.graph_nodes, 1281);
 
   const tracksRes = runQ(["--tracks", "World ID,Uniswap v4,Circle USDC,Open Innovation", "--json"]);
   assert.equal(tracksRes.status, 0, tracksRes.stderr);
@@ -134,6 +141,11 @@ check("query-brain.mjs runs --stats, --tracks, --condition, --framing, and --nei
   assert.equal(condRes.status, 0, condRes.stderr);
   const condJson = JSON.parse(condRes.stdout);
   assert.ok(condJson.total_matched > 0, "Expected C2 + F2 outside winner matches");
+
+  const c11bRes = runQ(["--condition", "C11B", "--json", "--limit", "5"]);
+  assert.equal(c11bRes.status, 0, c11bRes.stderr);
+  const c11bJson = JSON.parse(c11bRes.stdout);
+  assert.equal(c11bJson.total_matched, 302, "Expected exactly 302 C11B community winners");
 
   const graphRes = runQ(["--neighbors", "frame_f1_giant_compression", "--json", "--limit", "5"]);
   assert.equal(graphRes.status, 0, graphRes.stderr);
